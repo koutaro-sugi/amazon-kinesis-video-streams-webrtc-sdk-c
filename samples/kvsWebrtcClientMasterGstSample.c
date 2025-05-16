@@ -188,22 +188,13 @@ PVOID sendGstreamerAudioVideo(PVOID args)
             switch (pSampleConfiguration->srcType) {
                 case TEST_SOURCE: {
                     if (pSampleConfiguration->videoCodec == RTC_CODEC_H265) {
-                        senderPipeline = gst_parse_launch("videotestsrc pattern=ball is-live=TRUE ! timeoverlay ! queue ! videoconvert ! "
-                                                          "video/x-raw,width=1280,height=720,framerate=25/1 ! queue ! "
-                                                          "x265enc speed-preset=veryfast bitrate=512 tune=zerolatency ! "
-                                                          "video/x-h265,stream-format=byte-stream,alignment=au,profile=main ! appsink sync=TRUE "
-                                                          "emit-signals=TRUE name=appsink-video",
-                                                          &error);
+                       senderPipeline = gst_parse_launch(
+                    "v4l2src device=/dev/video2 ! video/x-h264,width=1280,height=720,framerate=30/1 ! queue max-size-buffers=500 max-size-bytes=10485760 max-size-time=1000000000 ! h264parse config-interval=-1 ! rtph264pay pt=96 mtu=1200 ! appsink sync=FALSE emit-signals=TRUE name=appsink-video",
+                    &error);
                     } else {
                         senderPipeline = gst_parse_launch(
-                            "videotestsrc pattern=ball is-live=TRUE ! "
-                            "queue ! videoconvert ! videoscale ! video/x-raw,width=1280,height=720 ! "
-                            "clockoverlay halignment=right valignment=top time-format=\"%Y-%m-%d %H:%M:%S\" ! "
-                            "videorate ! video/x-raw,framerate=25/1 ! "
-                            "x264enc name=sampleVideoEncoder bframes=0 speed-preset=veryfast bitrate=512 byte-stream=TRUE tune=zerolatency ! "
-                            "video/x-h264,stream-format=byte-stream,alignment=au,profile=baseline ! "
-                            "appsink sync=TRUE emit-signals=TRUE name=appsink-video",
-                            &error);
+                    "v4l2src device=/dev/video2 ! video/x-h264,width=1280,height=720,framerate=30/1 ! queue max-size-buffers=500 max-size-bytes=10485760 max-size-time=1000000000 ! h264parse config-interval=-1 ! rtph264pay pt=96 mtu=1200 ! appsink sync=FALSE emit-signals=TRUE name=appsink-video",
+                    &error);
                     }
                     break;
                 }
